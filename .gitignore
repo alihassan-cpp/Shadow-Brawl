@@ -1,0 +1,23 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Build folders
+Debug/
+Release/
+x64/
+x86/
+
+# Visual Studio generated files
+*.obj
+*.pdb
+*.ilk
+*.exe
+*.dll
+*.idb
+*.ipch
+
+# C++ build files
+*.tlog
+*.log
