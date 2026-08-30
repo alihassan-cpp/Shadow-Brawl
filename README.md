@@ -1,4 +1,4 @@
-# Shadow Brawl 🦖
+# Shadow Brawl 
 
 Shadow Brawl is a console-based endless runner game developed in C++ using Programming Fundamentals (PF) and Object-Oriented Programming (OOP) concepts.
 
@@ -6,7 +6,7 @@ The player controls a dinosaur and must jump over obstacles, avoid flying obstac
 
 ---
 
-## 🎮 Features
+##  Features
 
 - Console-based endless runner gameplay
 - Dinosaur jumping and gravity physics
@@ -26,7 +26,7 @@ The player controls a dinosaur and must jump over obstacles, avoid flying obstac
 
 ---
 
-## 🕹️ Controls
+##  Controls
 
 | Key | Action |
 |-----|--------|
@@ -39,7 +39,7 @@ The player controls a dinosaur and must jump over obstacles, avoid flying obstac
 
 ---
 
-## 🧠 Concepts Used
+##  Concepts Used
 
 ### Programming Fundamentals
 
@@ -64,7 +64,7 @@ The player controls a dinosaur and must jump over obstacles, avoid flying obstac
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```text
 Shadow-Brawl/
@@ -89,7 +89,7 @@ Shadow-Brawl/
 
 ---
 
-## ⚙️ Requirements
+##  Requirements
 
 - Windows
 - C++ compiler
@@ -102,7 +102,7 @@ The project uses Windows console functionality such as:
 
 ---
 
-## 🚀 How to Run
+##  How to Run
 
 1. Clone the repository.
 2. Open the project in Visual Studio.
@@ -112,7 +112,7 @@ The project uses Windows console functionality such as:
 
 ---
 
-## 🎯 Objective
+##  Objective
 
 Survive as long as possible, avoid obstacles, and achieve the highest score.
 
@@ -120,7 +120,7 @@ The game automatically saves the high score using file handling so it remains av
 
 ---
 
-## 🏗️ Project Architecture
+##  Project Architecture
 
 The project is divided into several classes, each with a specific responsibility.
 
@@ -142,7 +142,7 @@ Provides console-related functionality such as cursor positioning, colors, and s
 
 ---
 
-## 📌 Project Goal
+##  Project Goal
 
 Shadow Brawl was created as a practical C++ project to apply Programming Fundamentals and Object-Oriented Programming concepts to a complete playable game.
 

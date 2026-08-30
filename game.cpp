@@ -34,7 +34,7 @@ Game::Game()
 
     scoreTimer = 0;
 
-    gameSpeed = 1.5f;
+    gameSpeed = 1.7f;
 
     loadHighScore();
 }
@@ -119,6 +119,21 @@ void Game::handleInput()
             key == 'Q'
             )
         {
+            Console::clear();
+
+            Console::setColor(14);
+
+            Console::setCursorPosition(
+                25,
+                10
+            );
+
+            cout << "Exiting Shadow Brawl...";
+
+            Console::setColor(15);
+
+            Sleep(1000);
+
             state = GameState::EXIT;
         }
     }
@@ -131,49 +146,42 @@ void Game::handleInput()
 
 void Game::spawnObstacle()
 {
-    int pattern =
-        1 + rand() % 4;
+    int pattern = 1 + rand() % 4;
 
 
-    // Single obstacle
+    // ========================================================
+    // Pattern 1 - Small cactus
+    // ========================================================
 
     if (pattern == 1)
     {
-        int type =
-            1 + rand() % 4;
-
-
         obstacles.push_back(
             Obstacle(
                 SCREEN_WIDTH - 2,
-                type
+                1
             )
         );
     }
 
 
-    // Two small obstacles
+    // ========================================================
+    // Pattern 2 - Tall vertical cactus
+    // ========================================================
 
     else if (pattern == 2)
     {
         obstacles.push_back(
             Obstacle(
                 SCREEN_WIDTH - 2,
-                1
-            )
-        );
-
-
-        obstacles.push_back(
-            Obstacle(
-                SCREEN_WIDTH + 2,
-                1
+                4
             )
         );
     }
 
 
-    // Wide obstacle
+    // ========================================================
+    // Pattern 3 - Wide obstacle
+    // ========================================================
 
     else if (pattern == 3)
     {
@@ -186,7 +194,9 @@ void Game::spawnObstacle()
     }
 
 
-    // Flying obstacle
+    // ========================================================
+    // Pattern 4 - Flying obstacle
+    // ========================================================
 
     else
     {
@@ -199,25 +209,27 @@ void Game::spawnObstacle()
     }
 
 
-    // Spawn timing
+    // ========================================================
+    // FAIR SPAWN TIMING
+    // ========================================================
 
     int minimumDelay =
-        40 - (int)(gameSpeed * 4);
+        48 - (int)(gameSpeed * 4);
 
 
     int maximumDelay =
-        60 - (int)(gameSpeed * 5);
+        70 - (int)(gameSpeed * 5);
 
 
-    if (minimumDelay < 25)
+    if (minimumDelay < 30)
     {
-        minimumDelay = 25;
+        minimumDelay = 30;
     }
 
 
-    if (maximumDelay < 35)
+    if (maximumDelay < 40)
     {
-        maximumDelay = 35;
+        maximumDelay = 40;
     }
 
 
@@ -275,9 +287,7 @@ void Game::updateScore()
     scoreTimer++;
 
 
-    // Approximately every 0.25 seconds
-
-    if (scoreTimer >= 4)
+    if (scoreTimer >= 3)
     {
         score++;
 
@@ -299,13 +309,13 @@ void Game::updateScore()
 void Game::updateSpeed()
 {
     gameSpeed =
-        1.5f +
-        (score / 25) * 0.2f;
+        1.7f +
+        (score / 30) * 0.15f;
 
 
-    if (gameSpeed > 2.8f)
+    if (gameSpeed > 3.0f)
     {
-        gameSpeed = 2.8f;
+        gameSpeed = 3.0f;
     }
 }
 
@@ -410,7 +420,7 @@ bool Game::checkCollision(
 
 
 // ============================================================
-// CHECK ALL COLLISIONS
+// CHECK COLLISIONS
 // ============================================================
 
 bool Game::checkCollisions()
@@ -454,14 +464,14 @@ void Game::reset()
 
     scoreTimer = 0;
 
-    gameSpeed = 1.5f;
+    gameSpeed = 1.7f;
 
     state = GameState::PLAYING;
 }
 
 
 // ============================================================
-// START COUNTDOWN
+// COUNTDOWN
 // ============================================================
 
 void Game::startCountdown()
@@ -469,7 +479,11 @@ void Game::startCountdown()
     Console::clear();
 
 
-    for (int number = 3; number >= 1; number--)
+    for (
+        int number = 3;
+        number >= 1;
+        number--
+        )
     {
         Console::clear();
 
@@ -561,6 +575,20 @@ void Game::drawUI()
         << highScore;
 
 
+    // Controls
+
+    Console::setColor(11);
+
+    Console::setCursorPosition(
+        20,
+        2
+    );
+
+    cout << "     Q = QUIT            P = PAUSE";
+
+
+    // Separator
+
     Console::setColor(13);
 
     Console::setCursorPosition(
@@ -570,7 +598,6 @@ void Game::drawUI()
 
     cout <<
         "======================================================================";
-
 
     Console::setColor(15);
 }

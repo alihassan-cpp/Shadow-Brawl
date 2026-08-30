@@ -139,7 +139,6 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Completed.cpp" />
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="Dinosaur.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -151,6 +150,9 @@
     <ClInclude Include="Dinosaur.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Obstacle.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
