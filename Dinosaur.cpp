@@ -1,4 +1,5 @@
 #include "Dinosaur.h"
+#include "Console.h"
 #include <iostream>
 
 using namespace std;
@@ -49,6 +50,11 @@ void Dinosaur::update()
 
 void Dinosaur::draw() const
 {
+    Console::setCursorPosition(
+        x,
+        y
+    );
+
     cout << "D";
 }
 

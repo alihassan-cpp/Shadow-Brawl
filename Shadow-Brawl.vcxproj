@@ -140,12 +140,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Completed.cpp" />
+    <ClCompile Include="Console.cpp" />
     <ClCompile Include="Dinosaur.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Obstacle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Console.h" />
     <ClInclude Include="Dinosaur.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Obstacle.h" />

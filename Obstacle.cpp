@@ -1,4 +1,5 @@
 #include "Obstacle.h"
+#include "Console.h"
 #include <iostream>
 
 using namespace std;
@@ -90,44 +91,152 @@ void Obstacle::draw() const
 
 
     // Small cactus
+
     if (type == 1)
     {
+        Console::setCursorPosition(
+            drawX,
+            y
+        );
+
+        cout << "#";
+
+
+        Console::setCursorPosition(
+            drawX,
+            y - 1
+        );
+
         cout << "#";
     }
 
 
     // Medium cactus
+
     else if (type == 2)
     {
+        Console::setCursorPosition(
+            drawX,
+            y
+        );
+
+        cout << "##";
+
+
+        Console::setCursorPosition(
+            drawX,
+            y - 1
+        );
+
+        cout << "##";
+
+
+        Console::setCursorPosition(
+            drawX,
+            y - 2
+        );
+
         cout << "##";
     }
 
 
     // Wide cactus
+
     else if (type == 3)
     {
+        Console::setCursorPosition(
+            drawX,
+            y
+        );
+
+        cout << "####";
+
+
+        Console::setCursorPosition(
+            drawX,
+            y - 1
+        );
+
         cout << "####";
     }
 
 
     // Tall cactus
+
     else if (type == 4)
     {
+        Console::setCursorPosition(
+            drawX,
+            y
+        );
+
+        cout << "##";
+
+
+        Console::setCursorPosition(
+            drawX,
+            y - 1
+        );
+
+        cout << "##";
+
+
+        Console::setCursorPosition(
+            drawX,
+            y - 2
+        );
+
+        cout << "##";
+
+
+        Console::setCursorPosition(
+            drawX,
+            y - 3
+        );
+
         cout << "##";
     }
 
 
     // Large block
+
     else if (type == 5)
     {
+        Console::setCursorPosition(
+            drawX,
+            y
+        );
+
+        cout << "####";
+
+
+        Console::setCursorPosition(
+            drawX,
+            y - 1
+        );
+
         cout << "####";
     }
 
 
     // Flying obstacle
+
     else
     {
+        Console::setCursorPosition(
+            drawX + 1,
+            y
+        );
+
         cout << "T";
+
+
+        Console::setCursorPosition(
+            drawX,
+            y - 1
+        );
+
+        cout << "TTT";
     }
 }
 

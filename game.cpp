@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "Console.h"
 #include <iostream>
 #include <conio.h>
 #include <windows.h>
@@ -63,28 +64,12 @@ void Game::update()
 
 void Game::draw()
 {
-    system("cls");
-
-
-    cout << "========================================"
-        << endl;
-
-    cout << "             SHADOW BRAWL"
-        << endl;
-
-    cout << "========================================"
-        << endl;
-
-
-    cout << endl;
+    Console::clear();
 
 
     // Draw dinosaur
 
     dinosaur.draw();
-
-
-    cout << endl;
 
 
     // Draw obstacles
@@ -94,28 +79,17 @@ void Game::draw()
         obstacles
         )
     {
-        cout << "Obstacle at X: "
-            << obstacle.getX()
-            << endl;
-
-        cout << "Obstacle: ";
-
         obstacle.draw();
-
-        cout << endl;
     }
 
 
-    cout << endl;
-
-    cout << "SPACE / W = Jump" << endl;
-
-    cout << "Q = Quit" << endl;
+    cout.flush();
 }
-
-
 void Game::run()
 {
+    Console::hideCursor();
+
+
     while (running)
     {
         handleInput();
