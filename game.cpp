@@ -46,10 +46,16 @@ void Game::reset()
 
     score = 0;
 
+    scoreTimer = 0;
+
+    gameSpeed = 1.5f;
+
     state = GameState::PLAYING;
 }
 Game::Game()
 {
+    gameSpeed = 1.5f;
+
     state = GameState::PLAYING;
 
     spawnTimer = 0;
@@ -59,8 +65,9 @@ Game::Game()
     score = 0;
 
     highScore = 0;
-}
 
+    scoreTimer = 0;
+}
 
 // ============================================================
 // INPUT
@@ -119,8 +126,30 @@ void Game::spawnObstacle()
 
     // Random delay before next obstacle
 
+    int minimumDelay =
+        40 - (int)(gameSpeed * 4);
+
+
+    int maximumDelay =
+        60 - (int)(gameSpeed * 5);
+
+
+    if (minimumDelay < 25)
+    {
+        minimumDelay = 25;
+    }
+
+
+    if (maximumDelay < 35)
+    {
+        maximumDelay = 35;
+    }
+
+
     spawnDelay =
-        35 + rand() % 30;
+        minimumDelay +
+        rand() %
+        (maximumDelay - minimumDelay + 1);
 
 
     spawnTimer = spawnDelay;
@@ -133,19 +162,14 @@ void Game::spawnObstacle()
 
 void Game::updateObstacles()
 {
-    // Move obstacles
-
     for (
         Obstacle& obstacle :
         obstacles
         )
     {
-        obstacle.move(1.5f);
+        obstacle.move(gameSpeed);
     }
 
-
-    // Remove obstacles
-    // that have left the screen
 
     for (
         int i = 0;
@@ -164,9 +188,7 @@ void Game::updateObstacles()
             i--;
         }
     }
-}
-
-bool Game::checkCollision(
+}bool Game::checkCollision(
     const Dinosaur& dinosaur,
     const Obstacle& obstacle
 )
@@ -260,10 +282,11 @@ void Game::update()
     }
 
 
-    updateObstacles();
-
-
     updateScore();
+
+    updateSpeed();
+
+    updateObstacles();
 
 
     if (checkCollisions())
@@ -271,7 +294,6 @@ void Game::update()
         state = GameState::GAME_OVER;
     }
 }
-
 
 // ============================================================
 // DRAW UI
@@ -580,11 +602,29 @@ void Game::showGameOver()
 }
 void Game::updateScore()
 {
-    score++;
+    scoreTimer++;
 
+    if (scoreTimer >= 4)
+    {
+        score++;
+
+        scoreTimer = 0;
+    }
 
     if (score > highScore)
     {
         highScore = score;
+    }
+}
+void Game::updateSpeed()
+{
+    gameSpeed =
+        1.5f +
+        (score / 25) * 0.2f;
+
+
+    if (gameSpeed > 2.8f)
+    {
+        gameSpeed = 2.8f;
     }
 }

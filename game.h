@@ -17,6 +17,8 @@ enum class GameState
 class Game
 {
 private:
+    float gameSpeed;
+    int scoreTimer;
     int score;
     int highScore;
     GameState state;
@@ -33,6 +35,8 @@ private:
     void handleInput();
 
     void updateScore();
+
+    void updateSpeed();
 
     void update();
 
