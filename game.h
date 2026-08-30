@@ -6,11 +6,20 @@
 #include <vector>
 
 
+enum class GameState
+{
+    PLAYING,
+    GAME_OVER,
+    EXIT
+};
+
+
 class Game
 {
 private:
-
-    bool running;
+    int score;
+    int highScore;
+    GameState state;
 
     Dinosaur dinosaur;
 
@@ -23,7 +32,11 @@ private:
 
     void handleInput();
 
+    void updateScore();
+
     void update();
+
+    void reset();
 
     void updateObstacles();
 
@@ -43,6 +56,8 @@ private:
     void drawUI();
 
     void drawGround();
+
+    void showGameOver();
 
 
 public:

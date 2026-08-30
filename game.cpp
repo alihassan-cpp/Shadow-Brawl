@@ -34,14 +34,31 @@ const int WHITE = 15;
 // ============================================================
 // CONSTRUCTOR
 // ============================================================
-
-Game::Game()
+void Game::reset()
 {
-    running = true;
+    dinosaur.reset();
+
+    obstacles.clear();
 
     spawnTimer = 0;
 
     spawnDelay = 50;
+
+    score = 0;
+
+    state = GameState::PLAYING;
+}
+Game::Game()
+{
+    state = GameState::PLAYING;
+
+    spawnTimer = 0;
+
+    spawnDelay = 50;
+
+    score = 0;
+
+    highScore = 0;
 }
 
 
@@ -75,7 +92,7 @@ void Game::handleInput()
             key == 'Q'
             )
         {
-            running = false;
+            state = GameState::EXIT;
         }
     }
 }
@@ -246,9 +263,12 @@ void Game::update()
     updateObstacles();
 
 
+    updateScore();
+
+
     if (checkCollisions())
     {
-        running = false;
+        state = GameState::GAME_OVER;
     }
 }
 
@@ -295,7 +315,8 @@ void Game::drawUI()
     );
 
     cout <<
-        "SCORE: 0";
+        "SCORE: "
+        << score;
 
 
     // High score
@@ -308,7 +329,8 @@ void Game::drawUI()
     );
 
     cout <<
-        "HIGH SCORE: 0";
+        "HIGH SCORE: "
+        << highScore;
 
 
     // Bottom UI border
@@ -408,14 +430,161 @@ void Game::run()
     Console::hideCursor();
 
 
-    while (running)
+    while (
+        state != GameState::EXIT
+        )
     {
-        handleInput();
+        // -----------------------------
+        // PLAYING
+        // -----------------------------
 
-        update();
+        while (
+            state == GameState::PLAYING
+            )
+        {
+            handleInput();
 
-        draw();
+            update();
 
-        Sleep(60);
+            draw();
+
+            Sleep(60);
+        }
+
+
+        // -----------------------------
+        // GAME OVER
+        // -----------------------------
+
+        if (
+            state == GameState::GAME_OVER
+            )
+        {
+            showGameOver();
+        }
+    }
+}
+void Game::showGameOver()
+{
+    Console::clear();
+
+
+    Console::setColor(MAGENTA);
+
+    Console::setCursorPosition(
+        20,
+        7
+    );
+
+    cout <<
+        "==============================";
+
+
+    Console::setCursorPosition(
+        20,
+        8
+    );
+
+    Console::setColor(RED);
+
+    cout <<
+        "          GAME OVER";
+
+
+    Console::setColor(MAGENTA);
+
+    Console::setCursorPosition(
+        20,
+        9
+    );
+
+    cout <<
+        "==============================";
+
+
+    Console::setColor(GREEN);
+
+    Console::setCursorPosition(
+        27,
+        11
+    );
+
+    cout <<
+        "SCORE: "
+        << score;
+
+
+    Console::setColor(YELLOW);
+
+    Console::setCursorPosition(
+        25,
+        12
+    );
+
+    cout <<
+        "HIGH SCORE: "
+        << highScore;
+
+
+    Console::setColor(CYAN);
+
+    Console::setCursorPosition(
+        22,
+        15
+    );
+
+    cout <<
+        "Press R to restart";
+
+
+    Console::setColor(RED);
+
+    Console::setCursorPosition(
+        22,
+        16
+    );
+
+    cout <<
+        "Press Q to quit";
+
+
+    Console::setColor(WHITE);
+
+
+    while (true)
+    {
+        char key = _getch();
+
+
+        if (
+            key == 'q' ||
+            key == 'Q'
+            )
+        {
+            state = GameState::EXIT;
+
+            break;
+        }
+
+
+        if (
+            key == 'r' ||
+            key == 'R'
+            )
+        {
+            reset();
+
+            break;
+        }
+    }
+}
+void Game::updateScore()
+{
+    score++;
+
+
+    if (score > highScore)
+    {
+        highScore = score;
     }
 }
