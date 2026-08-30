@@ -67,6 +67,8 @@ private:
     void showPause();
     void showGameOver();
 
+    void startCountdown();
+
 
 public:
 

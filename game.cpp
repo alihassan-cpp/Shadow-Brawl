@@ -36,9 +36,6 @@ Game::Game()
 
     gameSpeed = 1.5f;
 
-
-    // Load saved high score
-
     loadHighScore();
 }
 
@@ -50,7 +47,6 @@ Game::Game()
 void Game::loadHighScore()
 {
     ifstream file("highscore.txt");
-
 
     if (file.is_open())
     {
@@ -72,7 +68,6 @@ void Game::loadHighScore()
 void Game::saveHighScore()
 {
     ofstream file("highscore.txt");
-
 
     if (file.is_open())
     {
@@ -344,9 +339,6 @@ void Game::update()
     {
         state = GameState::GAME_OVER;
 
-
-        // Save high score
-
         saveHighScore();
     }
 }
@@ -465,6 +457,55 @@ void Game::reset()
     gameSpeed = 1.5f;
 
     state = GameState::PLAYING;
+}
+
+
+// ============================================================
+// START COUNTDOWN
+// ============================================================
+
+void Game::startCountdown()
+{
+    Console::clear();
+
+
+    for (int number = 3; number >= 1; number--)
+    {
+        Console::clear();
+
+
+        Console::setColor(14);
+
+        Console::setCursorPosition(
+            34,
+            8
+        );
+
+        cout << number;
+
+
+        Console::setColor(15);
+
+        Sleep(1000);
+    }
+
+
+    Console::clear();
+
+
+    Console::setColor(10);
+
+    Console::setCursorPosition(
+        33,
+        8
+    );
+
+    cout << "GO!";
+
+
+    Console::setColor(15);
+
+    Sleep(500);
 }
 
 
@@ -683,6 +724,8 @@ void Game::showMenu()
         if (key == '1')
         {
             reset();
+
+            startCountdown();
 
             break;
         }
@@ -1020,7 +1063,7 @@ void Game::showGameOver()
 
 
 // ============================================================
-// MAIN LOOP
+// MAIN GAME LOOP
 // ============================================================
 
 void Game::run()
