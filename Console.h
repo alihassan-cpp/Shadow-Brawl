@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 
 class Console
 {
@@ -13,4 +12,8 @@ public:
     );
 
     static void hideCursor();
+
+    static void setColor(
+        int color
+    );
 };

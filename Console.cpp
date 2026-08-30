@@ -1,4 +1,5 @@
 #include "Console.h"
+
 #include <windows.h>
 #include <cstdlib>
 
@@ -40,5 +41,14 @@ void Console::hideCursor()
     SetConsoleCursorInfo(
         consoleHandle,
         &info
+    );
+}
+
+
+void Console::setColor(int color)
+{
+    SetConsoleTextAttribute(
+        GetStdHandle(STD_OUTPUT_HANDLE),
+        color
     );
 }
