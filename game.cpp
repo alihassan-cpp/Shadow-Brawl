@@ -6,68 +6,36 @@
 #include <windows.h>
 #include <cstdlib>
 
-
 using namespace std;
 
 
 // ============================================================
-// GAME CONSTANTS
+// CONSTANTS
 // ============================================================
 
 const int SCREEN_WIDTH = 70;
-
 const int GROUND_Y = 20;
-
-
-// ============================================================
-// COLORS
-// ============================================================
-
-const int GREEN = 10;
-const int CYAN = 11;
-const int RED = 12;
-const int MAGENTA = 13;
-const int YELLOW = 14;
-const int WHITE = 15;
 
 
 // ============================================================
 // CONSTRUCTOR
 // ============================================================
-void Game::reset()
-{
-    dinosaur.reset();
 
-    obstacles.clear();
-
-    spawnTimer = 0;
-
-    spawnDelay = 50;
-
-    score = 0;
-
-    scoreTimer = 0;
-
-    gameSpeed = 1.5f;
-
-    state = GameState::PLAYING;
-}
 Game::Game()
 {
-    gameSpeed = 1.5f;
-
-    state = GameState::PLAYING;
+    state = GameState::MENU;
 
     spawnTimer = 0;
-
     spawnDelay = 50;
 
     score = 0;
-
     highScore = 0;
 
     scoreTimer = 0;
+
+    gameSpeed = 1.5f;
 }
+
 
 // ============================================================
 // INPUT
@@ -79,9 +47,6 @@ void Game::handleInput()
     {
         char key = _getch();
 
-
-        // Jump
-
         if (
             key == ' ' ||
             key == 'w' ||
@@ -91,8 +56,13 @@ void Game::handleInput()
             dinosaur.jump();
         }
 
-
-        // Quit
+        else if (
+            key == 'p' ||
+            key == 'P'
+            )
+        {
+            state = GameState::PAUSED;
+        }
 
         else if (
             key == 'q' ||
@@ -111,24 +81,70 @@ void Game::handleInput()
 
 void Game::spawnObstacle()
 {
-    int obstacleType;
-
-    obstacleType = 1 + rand() % 6;
+    int pattern = 1 + rand() % 4;
 
 
-    obstacles.push_back(
-        Obstacle(
-            SCREEN_WIDTH - 2,
-            obstacleType
-        )
-    );
+    // Single obstacle
+    if (pattern == 1)
+    {
+        int type = 1 + rand() % 4;
+
+        obstacles.push_back(
+            Obstacle(
+                SCREEN_WIDTH - 2,
+                type
+            )
+        );
+    }
 
 
-    // Random delay before next obstacle
+    // Two small obstacles
+    else if (pattern == 2)
+    {
+        obstacles.push_back(
+            Obstacle(
+                SCREEN_WIDTH - 2,
+                1
+            )
+        );
+
+        obstacles.push_back(
+            Obstacle(
+                SCREEN_WIDTH + 2,
+                1
+            )
+        );
+    }
+
+
+    // Wide obstacle
+    else if (pattern == 3)
+    {
+        obstacles.push_back(
+            Obstacle(
+                SCREEN_WIDTH - 2,
+                3
+            )
+        );
+    }
+
+
+    // Flying obstacle
+    else
+    {
+        obstacles.push_back(
+            Obstacle(
+                SCREEN_WIDTH - 2,
+                6
+            )
+        );
+    }
+
+
+    // Spawn timing
 
     int minimumDelay =
         40 - (int)(gameSpeed * 4);
-
 
     int maximumDelay =
         60 - (int)(gameSpeed * 5);
@@ -138,7 +154,6 @@ void Game::spawnObstacle()
     {
         minimumDelay = 25;
     }
-
 
     if (maximumDelay < 35)
     {
@@ -150,7 +165,6 @@ void Game::spawnObstacle()
         minimumDelay +
         rand() %
         (maximumDelay - minimumDelay + 1);
-
 
     spawnTimer = spawnDelay;
 }
@@ -188,82 +202,53 @@ void Game::updateObstacles()
             i--;
         }
     }
-}bool Game::checkCollision(
-    const Dinosaur& dinosaur,
-    const Obstacle& obstacle
-)
-{
-    int dinosaurLeft =
-        dinosaur.getX();
-
-    int dinosaurRight =
-        dinosaur.getX() +
-        1;
-
-
-    int dinosaurTop =
-        dinosaur.getY();
-
-    int dinosaurBottom =
-        dinosaur.getY();
-
-
-    int obstacleLeft =
-        obstacle.getX();
-
-    int obstacleRight =
-        obstacle.getX() +
-        obstacle.getWidth() -
-        1;
-
-
-    int obstacleTop =
-        obstacle.getY() -
-        obstacle.getHeight() +
-        1;
-
-    int obstacleBottom =
-        obstacle.getY();
-
-
-    // Horizontal overlap
-
-    bool horizontalCollision =
-        dinosaurRight >= obstacleLeft &&
-        dinosaurLeft <= obstacleRight;
-
-
-    // Vertical overlap
-
-    bool verticalCollision =
-        dinosaurBottom >= obstacleTop &&
-        dinosaurTop <= obstacleBottom;
-
-
-    return horizontalCollision &&
-        verticalCollision;
 }
-bool Game::checkCollisions()
+
+
+// ============================================================
+// SCORE
+// ============================================================
+
+void Game::updateScore()
 {
-    for (
-        const Obstacle& obstacle :
-        obstacles
-        )
+    scoreTimer++;
+
+
+    // Approximately every 0.25 seconds
+
+    if (scoreTimer >= 4)
     {
-        if (
-            checkCollision(
-                dinosaur,
-                obstacle
-            )
-            )
-        {
-            return true;
-        }
+        score++;
+
+        scoreTimer = 0;
     }
 
 
-    return false;
+    if (score > highScore)
+    {
+        highScore = score;
+    }
 }
+
+
+// ============================================================
+// SPEED
+// ============================================================
+
+void Game::updateSpeed()
+{
+    gameSpeed =
+        1.5f +
+        (score / 25) * 0.2f;
+
+
+    if (gameSpeed > 2.8f)
+    {
+        gameSpeed = 2.8f;
+    }
+}
+
+
 // ============================================================
 // UPDATE
 // ============================================================
@@ -295,15 +280,126 @@ void Game::update()
     }
 }
 
+
+// ============================================================
+// COLLISION
+// ============================================================
+
+bool Game::checkCollision(
+    const Dinosaur& dinosaur,
+    const Obstacle& obstacle
+)
+{
+    int dinosaurLeft =
+        dinosaur.getX();
+
+    int dinosaurRight =
+        dinosaur.getX() +
+        dinosaur.getWidth() -
+        1;
+
+
+    int dinosaurTop =
+        dinosaur.getY() -
+        dinosaur.getHeight() +
+        1;
+
+    int dinosaurBottom =
+        dinosaur.getY();
+
+
+    int obstacleLeft =
+        obstacle.getX();
+
+    int obstacleRight =
+        obstacle.getX() +
+        obstacle.getWidth() -
+        1;
+
+
+    int obstacleTop =
+        obstacle.getY() -
+        obstacle.getHeight() +
+        1;
+
+    int obstacleBottom =
+        obstacle.getY();
+
+
+    bool horizontalCollision =
+        dinosaurRight >= obstacleLeft &&
+        dinosaurLeft <= obstacleRight;
+
+
+    bool verticalCollision =
+        dinosaurBottom >= obstacleTop &&
+        dinosaurTop <= obstacleBottom;
+
+
+    return
+        horizontalCollision &&
+        verticalCollision;
+}
+
+
+// ============================================================
+// CHECK ALL COLLISIONS
+// ============================================================
+
+bool Game::checkCollisions()
+{
+    for (
+        const Obstacle& obstacle :
+        obstacles
+        )
+    {
+        if (
+            checkCollision(
+                dinosaur,
+                obstacle
+            )
+            )
+        {
+            return true;
+        }
+    }
+
+
+    return false;
+}
+
+
+// ============================================================
+// RESET
+// ============================================================
+
+void Game::reset()
+{
+    dinosaur.reset();
+
+    obstacles.clear();
+
+    spawnTimer = 0;
+
+    spawnDelay = 50;
+
+    score = 0;
+
+    scoreTimer = 0;
+
+    gameSpeed = 1.5f;
+
+    state = GameState::PLAYING;
+}
+
+
 // ============================================================
 // DRAW UI
 // ============================================================
 
 void Game::drawUI()
 {
-    // Top border
-
-    Console::setColor(MAGENTA);
+    Console::setColor(13);
 
     Console::setCursorPosition(
         0,
@@ -314,9 +410,7 @@ void Game::drawUI()
         "======================================================================";
 
 
-    // Title
-
-    Console::setColor(GREEN);
+    Console::setColor(10);
 
     Console::setCursorPosition(
         2,
@@ -327,9 +421,7 @@ void Game::drawUI()
         "SHADOW BRAWL";
 
 
-    // Score
-
-    Console::setColor(GREEN);
+    Console::setColor(10);
 
     Console::setCursorPosition(
         25,
@@ -341,9 +433,7 @@ void Game::drawUI()
         << score;
 
 
-    // High score
-
-    Console::setColor(YELLOW);
+    Console::setColor(14);
 
     Console::setCursorPosition(
         45,
@@ -355,9 +445,7 @@ void Game::drawUI()
         << highScore;
 
 
-    // Bottom UI border
-
-    Console::setColor(MAGENTA);
+    Console::setColor(13);
 
     Console::setCursorPosition(
         0,
@@ -368,18 +456,17 @@ void Game::drawUI()
         "======================================================================";
 
 
-    Console::setColor(WHITE);
+    Console::setColor(15);
 }
 
 
 // ============================================================
-// DRAW GROUND
+// GROUND
 // ============================================================
 
 void Game::drawGround()
 {
-    Console::setColor(GREEN);
-
+    Console::setColor(10);
 
     Console::setCursorPosition(
         0,
@@ -397,7 +484,7 @@ void Game::drawGround()
     }
 
 
-    Console::setColor(WHITE);
+    Console::setColor(15);
 }
 
 
@@ -410,22 +497,13 @@ void Game::draw()
     Console::clear();
 
 
-    // Draw UI
-
     drawUI();
-
-
-    // Draw ground
 
     drawGround();
 
 
-    // Draw dinosaur
-
     dinosaur.draw();
 
-
-    // Draw all obstacles
 
     for (
         const Obstacle& obstacle :
@@ -436,62 +514,326 @@ void Game::draw()
     }
 
 
-    Console::setColor(WHITE);
-
+    Console::setColor(15);
 
     cout.flush();
 }
 
 
 // ============================================================
-// RUN
+// MENU
 // ============================================================
 
-void Game::run()
+void Game::showMenu()
 {
-    Console::hideCursor();
+    Console::clear();
+
+
+    Console::setColor(13);
+
+    Console::setCursorPosition(
+        15,
+        3
+    );
+
+    cout <<
+        "========================================";
+
+
+    Console::setColor(10);
+
+    Console::setCursorPosition(
+        27,
+        5
+    );
+
+    cout <<
+        "SHADOW BRAWL";
+
+
+    Console::setColor(13);
+
+    Console::setCursorPosition(
+        15,
+        7
+    );
+
+    cout <<
+        "========================================";
+
+
+    Console::setColor(11);
+
+    Console::setCursorPosition(
+        28,
+        10
+    );
+
+    cout <<
+        "1. PLAY";
+
+
+    Console::setColor(14);
+
+    Console::setCursorPosition(
+        25,
+        12
+    );
+
+    cout <<
+        "2. INSTRUCTIONS";
+
+
+    Console::setColor(12);
+
+    Console::setCursorPosition(
+        28,
+        14
+    );
+
+    cout <<
+        "3. EXIT";
+
+
+    Console::setColor(15);
 
 
     while (
-        state != GameState::EXIT
+        state == GameState::MENU
         )
     {
-        // -----------------------------
-        // PLAYING
-        // -----------------------------
+        char key = _getch();
 
-        while (
-            state == GameState::PLAYING
-            )
+
+        if (key == '1')
         {
-            handleInput();
+            reset();
 
-            update();
-
-            draw();
-
-            Sleep(60);
+            break;
         }
 
 
-        // -----------------------------
-        // GAME OVER
-        // -----------------------------
-
-        if (
-            state == GameState::GAME_OVER
-            )
+        if (key == '2')
         {
-            showGameOver();
+            state = GameState::INSTRUCTIONS;
+
+            break;
+        }
+
+
+        if (key == '3')
+        {
+            state = GameState::EXIT;
+
+            break;
         }
     }
 }
+
+
+// ============================================================
+// INSTRUCTIONS
+// ============================================================
+
+void Game::showInstructions()
+{
+    Console::clear();
+
+
+    Console::setColor(11);
+
+    Console::setCursorPosition(
+        25,
+        4
+    );
+
+    cout <<
+        "HOW TO PLAY";
+
+
+    Console::setColor(15);
+
+    Console::setCursorPosition(
+        20,
+        7
+    );
+
+    cout <<
+        "SPACE / W = JUMP";
+
+
+    Console::setCursorPosition(
+        20,
+        9
+    );
+
+    cout <<
+        "AVOID THE OBSTACLES";
+
+
+    Console::setCursorPosition(
+        20,
+        11
+    );
+
+    cout <<
+        "SURVIVE AS LONG AS POSSIBLE";
+
+
+    Console::setCursorPosition(
+        20,
+        13
+    );
+
+    cout <<
+        "P = PAUSE";
+
+
+    Console::setCursorPosition(
+        20,
+        14
+    );
+
+    cout <<
+        "Q = QUIT";
+
+
+    Console::setColor(14);
+
+    Console::setCursorPosition(
+        20,
+        17
+    );
+
+    cout <<
+        "Press B to go back";
+
+
+    Console::setColor(15);
+
+
+    while (
+        state == GameState::INSTRUCTIONS
+        )
+    {
+        char key = _getch();
+
+
+        if (
+            key == 'b' ||
+            key == 'B'
+            )
+        {
+            state = GameState::MENU;
+        }
+    }
+}
+
+
+// ============================================================
+// PAUSE
+// ============================================================
+
+void Game::showPause()
+{
+    Console::clear();
+
+
+    Console::setColor(14);
+
+    Console::setCursorPosition(
+        28,
+        6
+    );
+
+    cout <<
+        "====================";
+
+
+    Console::setColor(11);
+
+    Console::setCursorPosition(
+        34,
+        8
+    );
+
+    cout <<
+        "PAUSED";
+
+
+    Console::setColor(14);
+
+    Console::setCursorPosition(
+        28,
+        10
+    );
+
+    cout <<
+        "====================";
+
+
+    Console::setColor(10);
+
+    Console::setCursorPosition(
+        25,
+        13
+    );
+
+    cout <<
+        "P - RESUME";
+
+
+    Console::setColor(12);
+
+    Console::setCursorPosition(
+        25,
+        15
+    );
+
+    cout <<
+        "Q - QUIT";
+
+
+    Console::setColor(15);
+
+
+    while (
+        state == GameState::PAUSED
+        )
+    {
+        char key = _getch();
+
+
+        if (
+            key == 'p' ||
+            key == 'P'
+            )
+        {
+            state = GameState::PLAYING;
+        }
+
+
+        else if (
+            key == 'q' ||
+            key == 'Q'
+            )
+        {
+            state = GameState::EXIT;
+        }
+    }
+}
+
+
+// ============================================================
+// GAME OVER
+// ============================================================
+
 void Game::showGameOver()
 {
     Console::clear();
 
 
-    Console::setColor(MAGENTA);
+    Console::setColor(13);
 
     Console::setCursorPosition(
         20,
@@ -502,18 +844,18 @@ void Game::showGameOver()
         "==============================";
 
 
+    Console::setColor(12);
+
     Console::setCursorPosition(
-        20,
+        28,
         8
     );
 
-    Console::setColor(RED);
-
     cout <<
-        "          GAME OVER";
+        "GAME OVER";
 
 
-    Console::setColor(MAGENTA);
+    Console::setColor(13);
 
     Console::setCursorPosition(
         20,
@@ -524,7 +866,7 @@ void Game::showGameOver()
         "==============================";
 
 
-    Console::setColor(GREEN);
+    Console::setColor(10);
 
     Console::setCursorPosition(
         27,
@@ -536,7 +878,7 @@ void Game::showGameOver()
         << score;
 
 
-    Console::setColor(YELLOW);
+    Console::setColor(14);
 
     Console::setCursorPosition(
         25,
@@ -548,7 +890,7 @@ void Game::showGameOver()
         << highScore;
 
 
-    Console::setColor(CYAN);
+    Console::setColor(11);
 
     Console::setCursorPosition(
         22,
@@ -556,10 +898,10 @@ void Game::showGameOver()
     );
 
     cout <<
-        "Press R to restart";
+        "R - RETURN TO MENU";
 
 
-    Console::setColor(RED);
+    Console::setColor(12);
 
     Console::setCursorPosition(
         22,
@@ -567,10 +909,10 @@ void Game::showGameOver()
     );
 
     cout <<
-        "Press Q to quit";
+        "Q - QUIT";
 
 
-    Console::setColor(WHITE);
+    Console::setColor(15);
 
 
     while (true)
@@ -594,37 +936,85 @@ void Game::showGameOver()
             key == 'R'
             )
         {
-            reset();
+            state = GameState::MENU;
 
             break;
         }
     }
 }
-void Game::updateScore()
+
+
+// ============================================================
+// MAIN GAME LOOP
+// ============================================================
+
+void Game::run()
 {
-    scoreTimer++;
+    Console::hideCursor();
 
-    if (scoreTimer >= 4)
+
+    while (
+        state != GameState::EXIT
+        )
     {
-        score++;
+        // MENU
 
-        scoreTimer = 0;
-    }
-
-    if (score > highScore)
-    {
-        highScore = score;
-    }
-}
-void Game::updateSpeed()
-{
-    gameSpeed =
-        1.5f +
-        (score / 25) * 0.2f;
+        if (
+            state == GameState::MENU
+            )
+        {
+            showMenu();
+        }
 
 
-    if (gameSpeed > 2.8f)
-    {
-        gameSpeed = 2.8f;
+        // PLAYING
+
+        else if (
+            state == GameState::PLAYING
+            )
+        {
+            while (
+                state == GameState::PLAYING
+                )
+            {
+                handleInput();
+
+                update();
+
+                draw();
+
+                Sleep(60);
+            }
+        }
+
+
+        // PAUSED
+
+        else if (
+            state == GameState::PAUSED
+            )
+        {
+            showPause();
+        }
+
+
+        // GAME OVER
+
+        else if (
+            state == GameState::GAME_OVER
+            )
+        {
+            showGameOver();
+        }
+
+
+        // INSTRUCTIONS
+
+        else if (
+            state == GameState::INSTRUCTIONS
+            )
+        {
+            showInstructions();
+        }
     }
 }

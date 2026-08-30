@@ -5,22 +5,19 @@
 
 #include <vector>
 
-
 enum class GameState
 {
+    MENU,
     PLAYING,
+    PAUSED,
     GAME_OVER,
+    INSTRUCTIONS,
     EXIT
 };
-
 
 class Game
 {
 private:
-    float gameSpeed;
-    int scoreTimer;
-    int score;
-    int highScore;
     GameState state;
 
     Dinosaur dinosaur;
@@ -28,24 +25,24 @@ private:
     std::vector<Obstacle> obstacles;
 
     int spawnTimer;
-
     int spawnDelay;
 
+    int score;
+    int highScore;
+    int scoreTimer;
+
+    float gameSpeed;
 
     void handleInput();
 
-    void updateScore();
-
-    void updateSpeed();
-
     void update();
+    void updateScore();
+    void updateSpeed();
 
     void reset();
 
     void updateObstacles();
-
     void spawnObstacle();
-
 
     bool checkCollision(
         const Dinosaur& dinosaur,
@@ -54,18 +51,16 @@ private:
 
     bool checkCollisions();
 
-
     void draw();
-
     void drawUI();
-
     void drawGround();
 
+    void showMenu();
+    void showInstructions();
+    void showPause();
     void showGameOver();
 
-
 public:
-
     Game();
 
     void run();
