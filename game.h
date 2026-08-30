@@ -18,6 +18,7 @@ enum class GameState
 class Game
 {
 private:
+
     GameState state;
 
     Dinosaur dinosaur;
@@ -32,6 +33,7 @@ private:
     int scoreTimer;
 
     float gameSpeed;
+
 
     void handleInput();
 
@@ -51,6 +53,11 @@ private:
 
     bool checkCollisions();
 
+
+    void loadHighScore();
+    void saveHighScore();
+
+
     void draw();
     void drawUI();
     void drawGround();
@@ -60,7 +67,9 @@ private:
     void showPause();
     void showGameOver();
 
+
 public:
+
     Game();
 
     void run();

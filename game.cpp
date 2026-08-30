@@ -5,6 +5,7 @@
 #include <conio.h>
 #include <windows.h>
 #include <cstdlib>
+#include <fstream>
 
 using namespace std;
 
@@ -34,6 +35,51 @@ Game::Game()
     scoreTimer = 0;
 
     gameSpeed = 1.5f;
+
+
+    // Load saved high score
+
+    loadHighScore();
+}
+
+
+// ============================================================
+// LOAD HIGH SCORE
+// ============================================================
+
+void Game::loadHighScore()
+{
+    ifstream file("highscore.txt");
+
+
+    if (file.is_open())
+    {
+        file >> highScore;
+
+        file.close();
+    }
+    else
+    {
+        highScore = 0;
+    }
+}
+
+
+// ============================================================
+// SAVE HIGH SCORE
+// ============================================================
+
+void Game::saveHighScore()
+{
+    ofstream file("highscore.txt");
+
+
+    if (file.is_open())
+    {
+        file << highScore;
+
+        file.close();
+    }
 }
 
 
@@ -47,6 +93,9 @@ void Game::handleInput()
     {
         char key = _getch();
 
+
+        // Jump
+
         if (
             key == ' ' ||
             key == 'w' ||
@@ -56,6 +105,9 @@ void Game::handleInput()
             dinosaur.jump();
         }
 
+
+        // Pause
+
         else if (
             key == 'p' ||
             key == 'P'
@@ -63,6 +115,9 @@ void Game::handleInput()
         {
             state = GameState::PAUSED;
         }
+
+
+        // Quit
 
         else if (
             key == 'q' ||
@@ -81,13 +136,17 @@ void Game::handleInput()
 
 void Game::spawnObstacle()
 {
-    int pattern = 1 + rand() % 4;
+    int pattern =
+        1 + rand() % 4;
 
 
     // Single obstacle
+
     if (pattern == 1)
     {
-        int type = 1 + rand() % 4;
+        int type =
+            1 + rand() % 4;
+
 
         obstacles.push_back(
             Obstacle(
@@ -99,6 +158,7 @@ void Game::spawnObstacle()
 
 
     // Two small obstacles
+
     else if (pattern == 2)
     {
         obstacles.push_back(
@@ -107,6 +167,7 @@ void Game::spawnObstacle()
                 1
             )
         );
+
 
         obstacles.push_back(
             Obstacle(
@@ -118,6 +179,7 @@ void Game::spawnObstacle()
 
 
     // Wide obstacle
+
     else if (pattern == 3)
     {
         obstacles.push_back(
@@ -130,6 +192,7 @@ void Game::spawnObstacle()
 
 
     // Flying obstacle
+
     else
     {
         obstacles.push_back(
@@ -146,6 +209,7 @@ void Game::spawnObstacle()
     int minimumDelay =
         40 - (int)(gameSpeed * 4);
 
+
     int maximumDelay =
         60 - (int)(gameSpeed * 5);
 
@@ -154,6 +218,7 @@ void Game::spawnObstacle()
     {
         minimumDelay = 25;
     }
+
 
     if (maximumDelay < 35)
     {
@@ -165,6 +230,7 @@ void Game::spawnObstacle()
         minimumDelay +
         rand() %
         (maximumDelay - minimumDelay + 1);
+
 
     spawnTimer = spawnDelay;
 }
@@ -277,6 +343,11 @@ void Game::update()
     if (checkCollisions())
     {
         state = GameState::GAME_OVER;
+
+
+        // Save high score
+
+        saveHighScore();
     }
 }
 
@@ -293,6 +364,7 @@ bool Game::checkCollision(
     int dinosaurLeft =
         dinosaur.getX();
 
+
     int dinosaurRight =
         dinosaur.getX() +
         dinosaur.getWidth() -
@@ -304,12 +376,14 @@ bool Game::checkCollision(
         dinosaur.getHeight() +
         1;
 
+
     int dinosaurBottom =
         dinosaur.getY();
 
 
     int obstacleLeft =
         obstacle.getX();
+
 
     int obstacleRight =
         obstacle.getX() +
@@ -321,6 +395,7 @@ bool Game::checkCollision(
         obstacle.getY() -
         obstacle.getHeight() +
         1;
+
 
     int obstacleBottom =
         obstacle.getY();
@@ -945,7 +1020,7 @@ void Game::showGameOver()
 
 
 // ============================================================
-// MAIN GAME LOOP
+// MAIN LOOP
 // ============================================================
 
 void Game::run()
@@ -957,8 +1032,6 @@ void Game::run()
         state != GameState::EXIT
         )
     {
-        // MENU
-
         if (
             state == GameState::MENU
             )
@@ -966,8 +1039,6 @@ void Game::run()
             showMenu();
         }
 
-
-        // PLAYING
 
         else if (
             state == GameState::PLAYING
@@ -988,8 +1059,6 @@ void Game::run()
         }
 
 
-        // PAUSED
-
         else if (
             state == GameState::PAUSED
             )
@@ -998,8 +1067,6 @@ void Game::run()
         }
 
 
-        // GAME OVER
-
         else if (
             state == GameState::GAME_OVER
             )
@@ -1007,8 +1074,6 @@ void Game::run()
             showGameOver();
         }
 
-
-        // INSTRUCTIONS
 
         else if (
             state == GameState::INSTRUCTIONS
